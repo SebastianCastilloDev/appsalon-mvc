@@ -1,7 +1,7 @@
 <h1 class="nombre-pagina">Crear Cuenta</h1>
 <p class="descripcion-pagina">LLena el siguiente formulario para crear una cuenta</p>
 
-<form action="POST" class="formulario" action="/crear-cuenta">
+<form method="POST" class="formulario" action="/crear-cuenta">
     <div class="campo">
         <label for="nombre">Nombre</label>
         <input type="text" id="nombre" name="nombre" placeholder="Tu nombre"/>
@@ -9,6 +9,10 @@
     <div class="campo">
         <label for="apellido">Apellido</label>
         <input type="text" id="apellido" name="apellido" placeholder="Tu apellido"/>
+    </div>
+    <div class="campo">
+        <label for="telefono">Teléfono</label>
+        <input type="tel" id="telefono" name="telefono" placeholder="Tu telefono" >
     </div>
     <div class="campo">
         <label for="email">E-mail</label>
@@ -25,5 +29,5 @@
 
 <div class="acciones">
     <a href="/">¿Ya tienes un cuenta? Inicia Sesión</a>
-    <a href="/olvide">¿Olvidaste tu password?</a>
+    <a href="/olvide-password">¿Olvidaste tu password?</a>
 </div>
