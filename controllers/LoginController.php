@@ -54,19 +54,23 @@ class LoginController {
     public static function olvide(Router $router){
 
         $alertas = [];
+
         if($_SERVER['REQUEST_METHOD']==="POST"){
+
             $auth = new Usuario($_POST);
             $alertas = $auth->validarEmail();
 
             if(empty($alertas)){
+                //verificar que el email de usuario existe
                 $usuario = Usuario::where('email', $auth->email);
+
                 if($usuario && $usuario->confirmado==="1"){
 
                     // Generar token de un solo uso
                     $usuario->crearToken();
                     $usuario->guardar();
 
-                    //TODO: Enviar el email
+                    //Enviar el email
                     $email = new Email($usuario->email, $usuario->nombre, $usuario->token);
                     $email->enviarInstrucciones();
 
@@ -111,7 +115,7 @@ class LoginController {
 
                 $resultado = $usuario->guardar();
                 if($resultado){
-                    header('Location :/');
+                    header('Location: /');
                 }
             }
         }
