@@ -2,6 +2,13 @@ let paso = 1
 const pasoInicial = 1
 const pasoFinal = 3
 
+const cita = {
+    nombre:'',
+    fecha:'',
+    hora:'',
+    servicios:[]
+}
+
 document.addEventListener('DOMContentLoaded', function(){
     iniciarApp()
 })
@@ -13,6 +20,8 @@ function iniciarApp(){
     botonesPaginador() // agrega o quita los botones del paginador
     paginaSiguiente()
     paginaAnterior()
+
+    consultarAPI(); //consulta la api en el backend
 }
 
 function mostrarSeccion(){
@@ -86,4 +95,53 @@ function paginaSiguiente(){
 
         botonesPaginador()
     })
+}
+
+async function consultarAPI(){
+    
+    try {
+        const url = 'http://localhost:3000/api/servicios'
+        const resultado = await fetch(url);
+        const servicios = await resultado.json()
+        mostrarServicios(servicios)
+    } catch (error) {
+        console.log(error)
+    }
+    
+}
+
+function mostrarServicios(servicios){
+    servicios.forEach( servicio => {
+        const { id, nombre, precio } = servicio
+        const nombreServicio = document.createElement('P')
+        nombreServicio.classList.add('nombre-servicio')
+        nombreServicio.textContent = nombre
+
+        const precioServicio = document.createElement('P')
+        precioServicio.classList.add('precio-servicio')
+        precioServicio.textContent = `$ ${precio}`
+
+        const servicioDiv = document.createElement('DIV')
+        servicioDiv.classList.add('servicio') 
+        servicioDiv.dataset.idServicio = id //agrega al html "data-id-servicio"
+        servicioDiv.onclick = function(){
+            seleccionarServicio(servicio)
+        }
+
+        servicioDiv.appendChild(nombreServicio)
+        servicioDiv.appendChild(precioServicio)
+
+        document.querySelector('#servicios').appendChild(servicioDiv)
+    })
+}
+
+function seleccionarServicio(servicio){
+    const {id} = servicio
+    const {servicios} = cita
+    
+    cita.servicios = [...servicios, servicio]
+
+    const divServicio = document.querySelector(`[data-id-servicio="${id}"]`)
+    divServicio.classList.add('seleccionado')
+    console.log(cita)
 }
