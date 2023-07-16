@@ -21,7 +21,13 @@ function iniciarApp(){
     paginaSiguiente()
     paginaAnterior()
 
-    consultarAPI(); //consulta la api en el backend
+    consultarAPI(); // consulta la api en el backend de php
+    nombreCliente() // Añade el nombre del cliente al objeto de cita
+    seleccionarFecha() // Añade la fecha de la cita en el objeto
+    seleccionarHora() // Añade la hora de la cita en el objeto
+
+    mostrarResumen() // Muestra el resumen de la cita
+
 }
 
 function mostrarSeccion(){
@@ -56,6 +62,11 @@ function tabs(){
 
             mostrarSeccion()
             botonesPaginador()
+
+            if (paso === 3) {
+                mostrarResumen()
+            }
+
         })
     } )
 }
@@ -70,6 +81,7 @@ function botonesPaginador() {
     } else if(paso===3){
         paginaAnterior.classList.remove('ocultar')
         paginaSiguiente.classList.add('ocultar')
+        mostrarResumen()
     } else {
         paginaAnterior.classList.remove('ocultar')
         paginaSiguiente.classList.remove('ocultar')
@@ -138,10 +150,90 @@ function mostrarServicios(servicios){
 function seleccionarServicio(servicio){
     const {id} = servicio
     const {servicios} = cita
-    
-    cita.servicios = [...servicios, servicio]
-
     const divServicio = document.querySelector(`[data-id-servicio="${id}"]`)
-    divServicio.classList.add('seleccionado')
-    console.log(cita)
+
+    // Comprobar si un servicio ya fue agregado
+    if (servicios.some( agregado => agregado.id === id )) {
+        // eliminarlo
+        cita.servicios = servicios.filter( agregado => agregado.id !== id )
+        divServicio.classList.remove('seleccionado')
+    } else {
+        //agregarlo
+        cita.servicios = [...servicios, servicio]
+        divServicio.classList.add('seleccionado')
+    }
+
+
+    // console.log(cita)
+}
+
+function nombreCliente() {
+   cita.nombre = document.querySelector('#nombre').value
+}
+    
+function seleccionarFecha() {
+    const inputFecha = document.querySelector('#fecha')
+    inputFecha.addEventListener('input', function(e){
+        const dia = new Date(e.target.value).getUTCDay()
+
+        //solo se trabajara de lunes a viernes
+        if( [6,0].includes(dia)){
+            e.target.value = ""
+            mostrarAlerta('Fines de semana no permitidos', 'error', '.formulario')
+        } else {
+            console.log('dia correcto')
+        }
+
+    })
+}
+
+function seleccionarHora(){
+    const inputHora = document.querySelector('#hora')
+    inputHora.addEventListener('input', function(e){
+
+        const horaCita = e.target.value
+        const hora = horaCita.split(':')[0]
+        if(hora < 10 || hora > 18) {
+            mostrarAlerta('hora no valida', 'error', '.formulario')
+        } else {
+            cita.hora = e.target.value
+            console.log(cita)
+        }
+    })
+}
+
+function mostrarAlerta(mensaje, tipo, elemento, desaparece = true){
+
+    //previene que se genere mas de una alerta
+    const alertaPrevia = document.querySelector('.alerta')
+    if(alertaPrevia) {
+        alertaPrevia.remove()
+    };
+
+    // Scripting para generar la alerta
+    const alerta = document.createElement('DIV')
+    alerta.textContent = mensaje
+    alerta.classList.add('alerta')
+    alerta.classList.add(tipo)
+
+    const referencia = document.querySelector(elemento)
+    referencia.appendChild(alerta)
+
+    // Eliminar la alerta
+    if (desaparece){
+        setTimeout(()=>{
+            alerta.remove()
+        }, 3000)
+    }
+    
+}
+
+function mostrarResumen(){
+    const resumen = document.querySelector('.contenido-resumen')
+
+    if (Object.values(cita).includes('') || cita.servicios.length === 0){
+        mostrarAlerta('Faltan datos de servicios, Fecha u Hora', 'error', '.contenido-resumen', false)
+    } else {
+        console.log('todo bien')
+    }
 }
