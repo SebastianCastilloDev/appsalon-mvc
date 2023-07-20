@@ -3,6 +3,7 @@ const pasoInicial = 1
 const pasoFinal = 3
 
 const cita = {
+    id:'',
     nombre:'',
     fecha:'',
     hora:'',
@@ -22,6 +23,8 @@ function iniciarApp(){
     paginaAnterior()
 
     consultarAPI(); // consulta la api en el backend de php
+
+    idCliente()
     nombreCliente() // Añade el nombre del cliente al objeto de cita
     seleccionarFecha() // Añade la fecha de la cita en el objeto
     seleccionarHora() // Añade la hora de la cita en el objeto
@@ -164,9 +167,13 @@ function seleccionarServicio(servicio){
     }
 
 
-    // console.log(cita)
 }
 
+
+
+function idCliente() {
+   cita.id = document.querySelector('#id').value
+}
 function nombreCliente() {
    cita.nombre = document.querySelector('#nombre').value
 }
@@ -182,7 +189,6 @@ function seleccionarFecha() {
             mostrarAlerta('Fines de semana no permitidos', 'error', '.formulario')
         } else {
             cita.fecha = e.target.value
-            console.log('dia correcto')
         }
 
     })
@@ -198,7 +204,6 @@ function seleccionarHora(){
             mostrarAlerta('hora no valida', 'error', '.formulario')
         } else {
             cita.hora = e.target.value
-            console.log(cita)
         }
     })
 }
@@ -309,10 +314,50 @@ function mostrarResumen(){
     resumen.appendChild(fechaCita)
     resumen.appendChild(horaCita)
     resumen.appendChild(botonReservar)
-
-
 }
 
-function reservarCita() {
+async function reservarCita() {
+    const {nombre, fecha, hora, servicios, id} = cita
+
+    const idServicios = servicios.map((servicio)=>{
+        return servicio.id
+    })
+
+    const datos = new FormData()
+    datos.append('fecha', fecha)
+    datos.append('hora', hora)
+    datos.append('usuarioId', id)
+    datos.append('servicios', idServicios)
+
+    try {
+        const url = "http://localhost:3000/api/citas"
+
+        const respuesta = await fetch(url, {
+            method: 'POST',
+            body: datos
+        })
+        const resultado = await respuesta.json()
+        if(resultado.resultado){
+            Swal.fire({
+                icon: 'success',
+                title: 'Cita creada',
+                text: 'Tu cita fue creada correctamente',
+                button: 'OK'
+            }).then(()=>{
+                window.location.reload()
+            })
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Hubo un error al guardar la cita',
+          })
+    }
+
+    // peticion hacia la api
+   
+
     
+
 }
